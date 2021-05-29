@@ -45,8 +45,6 @@ def main():
     parser.add_argument('-t', '--title', action='store_true', help='save original filenames')
     args = parser.parse_args()
 
-    # TODO: Organize these if statements!
-    # Some of them would be better as `elif`s!
     if args.quiet:
         logging.basicConfig(level=logging.ERROR)
         args.less = False
@@ -71,17 +69,10 @@ def main():
         log.info('The --mlevel function is still in development, so enabling it has no effect!')
 
     thread = args.thread[0].strip()
-    if thread[:4].lower() == 'http':
+    if thread[:4].lower() == 'http' and not os.path.exists(thread):
         download_thread(thread, args)
     else:
         download_from_file(thread)
-
-    if args.title:
-        try:
-            import bs4
-        except ImportError:
-            logging.error("Could not import BeautifulSoup! Disabling --title option...")
-            args.title = False
 
 def load(url):
     req = urllib.request.Request(url, headers={'User-Agent': '4chan Browser'})
