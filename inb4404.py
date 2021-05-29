@@ -41,7 +41,6 @@ def main():
     parser.add_argument('-q', '--quiet', action='store_true', help='suppress all other logging options, only shows errors')
     parser.add_argument('-o', '--once', action='store_true', help='only check each thread once and quit (supresses --reload)')
     parser.add_argument('-r', '--reload', action='store_true', help='reload the queue file every 5 minutes')
-    #TODO: The two options below this line are also not implemented.
     parser.add_argument('-s', '--split', action='store', help='choose substring to separate thread URLs in threads file (default: \\n)')
     parser.add_argument('-t', '--title', action='store_true', help='save original filenames')
     args = parser.parse_args()
@@ -117,7 +116,6 @@ def download_thread(thread_link, args):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    # TODO: Wrap my head around this loop. :woozy:
     while True:
         if not args.less:
             log.info('Checking ' + board + '/' + thread)
@@ -188,20 +186,22 @@ def download_thread(thread_link, args):
         time.sleep(20)
 
 def download_from_file(filename):
-    # TODO: Finish all of this...
     running_links = list()
-    split_text = list()
     fptr = open(filename)
 
-    if args.split == None:
-        for line in fptr:
-            split_text += line
-    else:
-        split_text = fptr.read().split(args.split)
+    links_generator = open(filename)
+    if args.split:
+        links_generator = links_generator.read().split(args.split)
+
+    for link_str in links_generator:
+        if len(re.findall('http', link_str)) > 1:
+            log.error('Error parsing links from file. Your --split argument may have been misused.')
+            log.error('Removing %s...', repr(link_str))
+            links_generator.remove(link_str)
 
     while True:
         processes = []
-        for link in [_f for _f in [line.strip() for line in open(filename) if line[:4] == 'http'] if _f]:
+        for link in [_f for _f in [line.strip() for line in links_generator if line[:4] == 'http'] if _f]:
             if link not in running_links:
                 running_links.append(link)
                 log.info('Added ' + link)
