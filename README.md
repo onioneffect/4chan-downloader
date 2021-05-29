@@ -34,6 +34,7 @@ optional arguments:
   -s SPLIT, --split SPLIT
                         choose substring to separate thread URLs in threads
                         file. (default: \n)
+  -t, --title           save original filenames
 
 MLEVEL value:        Behaviour:
   0                     Remove 404'd threads from file
