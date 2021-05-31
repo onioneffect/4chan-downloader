@@ -10,11 +10,38 @@ log = logging.getLogger('inb4404')
 workpath = os.path.dirname(os.path.realpath(__file__))
 args = None
 
+# TODO: Make a function that returns only the parsed thread links
+# See lines 193-209
+# TODO: Make a copy of the file before writing to it! Very important!
+def handle_mlevel(thread_index : int, code):
+    urls_file = open(args.thread[0], "r")
+    all_urls = urls_file.read().split(args.split)
+    urls_file.close()
+
+    if code == 0:
+        all_urls.pop(thread_index)
+    elif code == 3:
+        all_urls[thread_index] = '#' + all_urls[thread_index]
+
+    if not args.split:
+        joiner = '\n'
+    else:
+        joiner = args.split
+
+    w_urls_file = open(args.thread[0], "w")
+    w_urls_file.write(joiner.join(all_urls))
+    w_urls_file.close()
+
+# TODO: Make it possible to combine multiple of these!
+# Also make the codes more extensible!
 def mlevel_msg():
     cool = [
         "Remove 404'd threads from file",
         "Remove archived threads",
-        "Remove archived threads, while backing up file (recommended)"
+        "Remove duplicate threads",
+        "Comment out 404'd threads",
+        "Comment out archived threads",
+        "Comment out duplicate threads"
     ]
 
     ret = """MLEVEL value:        Behaviour:
@@ -94,7 +121,7 @@ def get_title_list(html_content):
 
     return ret
 
-def download_thread(thread_link, args):
+def download_thread(thread_link, args, thread_index = None):
     board = thread_link.split('/')[3]
     thread = thread_link.split('/')[5].split('#')[0]
     if len(thread_link.split('/')) > 6:
@@ -166,6 +193,9 @@ def download_thread(thread_link, args):
             except urllib.error.HTTPError as err:
                 if err.code == 404:
                     log.info(thread_link + ' 404\'d')
+                    
+                    if int(args.mlevel) in (0, 3):
+                        handle_mlevel(thread_index, int(args.mlevel))
                 else:
                     log.error('Something went very wrong! Response code: ' + str(err.code))
 
@@ -191,12 +221,12 @@ def download_from_file(filename):
 
     while True:
         processes = []
-        for link in [_f for _f in [line.strip() for line in links_generator if line[:4] == 'http'] if _f]:
+        for link_ind, link in enumerate([_f for _f in [line.strip() for line in links_generator if line[:4] == 'http'] if _f]):
             if link not in running_links and not link.startswith("#"):
                 running_links.append(link)
                 log.info('Added ' + link)
 
-            process = Process(target=download_thread, args=(link, args, ))
+            process = Process(target=download_thread, args=(link, args, link_ind))
             process.start()
             processes.append([process, link])
 
