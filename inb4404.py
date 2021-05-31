@@ -36,7 +36,7 @@ def main():
     parser.add_argument('-c', '--with-counter', action='store_true', help='show a counter next the the image that has been downloaded')
     parser.add_argument('-d', '--date', action='store_true', help='show date as well')
     parser.add_argument('-l', '--less', action='store_true', help='show less information (supresses checking messages)')
-    parser.add_argument('-m', '--mlevel', action='store', help='define how strictly to manage threads file') # TODO
+    parser.add_argument('-m', '--mlevel', action='store', help='define how to manage threads file') # TODO
     parser.add_argument('-n', '--use-names', action='store_true', help='use thread names instead of the thread ids (...4chan.org/board/thread/thread-id/thread-name)')
     parser.add_argument('-q', '--quiet', action='store_true', help='suppress all other logging options, only shows errors')
     parser.add_argument('-o', '--once', action='store_true', help='only check each thread once and quit (supresses --reload)')
@@ -180,9 +180,8 @@ def download_from_file(filename):
     running_links = list()
     fptr = open(filename)
 
-    links_generator = open(filename)
-    if args.split:
-        links_generator = links_generator.read().split(args.split)
+    # Running .split(None) defaults to splitting on whitespace
+    links_generator = fptr.read().split(args.split)
 
     for link_str in links_generator:
         if len(re.findall('http', link_str)) > 1:
@@ -193,7 +192,7 @@ def download_from_file(filename):
     while True:
         processes = []
         for link in [_f for _f in [line.strip() for line in links_generator if line[:4] == 'http'] if _f]:
-            if link not in running_links:
+            if link not in running_links and not link.startswith("#"):
                 running_links.append(link)
                 log.info('Added ' + link)
 
@@ -207,7 +206,7 @@ def download_from_file(filename):
         if args.reload:
             time.sleep(60 * 5) # 5 minutes
             links_to_remove = []
-            # Find out what all this does VVVVVVV
+
             for process, link in processes:
                 if not process.is_alive():
                     links_to_remove.append(link)
