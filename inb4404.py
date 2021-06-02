@@ -36,18 +36,18 @@ def handle_mlevel(thread_index : int, code):
 # Also make the codes more extensible!
 def mlevel_msg():
     cool = [
-        "Remove 404'd threads from file",
-        "Remove archived threads",
-        "Remove duplicate threads",
-        "Comment out 404'd threads",
-        "Comment out archived threads",
-        "Comment out duplicate threads"
+        'Remove 404\'d threads from file',
+        'Remove archived threads',
+        'Remove duplicate threads',
+        'Comment out 404\'d threads',
+        'Comment out archived threads',
+        'Comment out duplicate threads'
     ]
 
-    ret = """MLEVEL value:        Behaviour:
-"""
+    ret = '''MLEVEL value:        Behaviour:
+'''
     for i, j in enumerate(cool):
-        ret += "  {0}                     {1}\n".format(i, j)
+        ret += '  {0}                     {1}\n'.format(i, j)
 
     return ret
 
@@ -84,7 +84,7 @@ def main():
         try:
             import bs4
         except ImportError:
-            log.warning("BeautifulSoup4 not found! Disabling --title option!")
+            log.warning('BeautifulSoup4 not found! Disabling --title option!')
             args.title = False
 
     chan_fmt = '%I:%M:%S %p'
@@ -110,12 +110,12 @@ def get_title_list(html_content):
 
     from bs4 import BeautifulSoup
     parsed = BeautifulSoup(html_content, 'html.parser')
-    divs = parsed.find_all("div", {"class": "fileText"})
+    divs = parsed.find_all('div', {'class': 'fileText'})
 
     for i in divs:
-        current_child = i.findChildren("a", recursive = False)[0]
+        current_child = i.findChildren('a', recursive = False)[0]
         try:
-            ret.append(current_child["title"])
+            ret.append(current_child['title'])
         except KeyError:
             ret.append(current_child.text)
 
@@ -222,7 +222,7 @@ def download_from_file(filename):
     while True:
         processes = []
         for link_ind, link in enumerate([_f for _f in [line.strip() for line in links_generator if line[:4] == 'http'] if _f]):
-            if link not in running_links and not link.startswith("#"):
+            if link not in running_links and not link.startswith('#'):
                 running_links.append(link)
                 log.info('Added ' + link)
 
