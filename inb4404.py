@@ -121,7 +121,15 @@ def get_title_list(html_content):
 
     return ret
 
-def download_thread(thread_link, args, thread_index = None):
+def call_download_thread(thread_link, args):
+    try:
+        download_thread(thread_link, args)
+    except KeyboardInterrupt:
+        pass
+
+    return
+
+def download_thread(thread_link, args):
     board = thread_link.split('/')[3]
     thread = thread_link.split('/')[5].split('#')[0]
     if len(thread_link.split('/')) > 6:
