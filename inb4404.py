@@ -194,7 +194,7 @@ def download_thread(thread_link, args, thread_index = None):
                 if err.code == 404:
                     log.info(thread_link + ' 404\'d')
                     
-                    if int(args.mlevel) in (0, 3):
+                    if args.mlevel and int(args.mlevel) in (0, 3):
                         handle_mlevel(thread_index, int(args.mlevel))
                 else:
                     log.error('Something went very wrong! Response code: ' + str(err.code))
