@@ -234,7 +234,7 @@ def download_from_file(filename):
                 running_links.append(link)
                 log.info('Added ' + link)
 
-            process = Process(target=download_thread, args=(link, args, link_ind))
+            process = Process(target=call_download_thread, args=(link, args))
             process.start()
             processes.append([process, link])
 
