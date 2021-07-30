@@ -77,6 +77,10 @@ def main():
         args.less = False
         args.date = False
 
+    if args.split == '/':
+        log.warning('Custom separator cannot be a slash. Setting to None...')
+        args.split = None
+
     if args.once:
         args.reload = False
 
